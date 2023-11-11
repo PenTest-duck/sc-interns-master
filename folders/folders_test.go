@@ -1,15 +1,11 @@
 package folders
 
-//package folders_test
-
 import (
-	"os"
+	"reflect"
 	"strconv"
 	"testing"
 
 	"github.com/gofrs/uuid"
-	// "github.com/georgechieng-sc/interns-2022/folders"
-	// "github.com/stretchr/testify/assert"
 )
 
 // Run all tests for sample.json
@@ -35,7 +31,8 @@ func Test_GetAllFoldersWithSampleJSON(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			// Fetch expected results from file
-			expectedResult, err := ReadExpectedResult(test.id)
+			JSONFilePath := "test-data/expected-test" + strconv.Itoa(test.id) + ".json"
+			expectedResult, err := GetJSONData(JSONFilePath)
 			if err != nil {
 				t.Fatalf("Error reading test data: %v", err)
 			}
@@ -50,10 +47,9 @@ func Test_GetAllFoldersWithSampleJSON(t *testing.T) {
 			if err != nil { // Ensure no fatal errors
 				t.Fatalf("Error with GetAllFolders(): %v", err)
 			}
-			prettifiedRes := Prettify(res)
 
 			// Ensure result is correct
-			if prettifiedRes != expectedResult {
+			if !reflect.DeepEqual(res.Folders, expectedResult) {
 				t.Errorf("Result for sample.json is incorrect")
 			}
 		})
@@ -101,15 +97,4 @@ func Test_GetAllFoldersWithRandomData(t *testing.T) {
 			}
 		})
 	}
-}
-
-// Reads expected result from file as string
-func ReadExpectedResult(testID int) (string, error) {
-	fileName := "test-data/expected-test" + strconv.Itoa(testID) + ".json"
-	file, err := os.ReadFile(fileName)
-	if err != nil {
-		return "", err
-	}
-
-	return string(file), nil
 }

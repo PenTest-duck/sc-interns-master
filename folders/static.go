@@ -2,6 +2,7 @@ package folders
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"os"
@@ -17,10 +18,13 @@ import (
 // If you do make changes here, be ready to discuss why these changes were made.
 
 const DefaultOrgID = "c1556e17-b7c0-45a3-a6ae-9546248fb17a"
+
 const RandomDataSetSize = -1 // acts as a flag to generate data of random size
 const DefaultDataSetSize = 1000
 const MinDataSetSize = 0
 const MaxDataSetSize = 1000000
+
+const DefaultPagesize = 10
 
 type Folder struct {
 	// A unique identifier for the folder, must be a valid UUID.
@@ -72,32 +76,31 @@ func GenerateData(dataSetSize int) ([]*Folder, int, error) {
 }
 
 // Applies indentation to JSON output and prints it
-// EDITED: just prettify it to allow code reuse when testing
-func Prettify(rawJSON interface{}) string {
+func PrettyPrint(rawJSON interface{}) {
 	prettifiedJSON, _ := json.MarshalIndent(rawJSON, "", "\t") // applying indentation
-	return string(prettifiedJSON)
+	fmt.Println(string(prettifiedJSON))
 }
 
 // Fetch folder structs from sample file
-func GetSampleData() ([]*Folder, error) {
+func GetJSONData(JSONFileName string) ([]*Folder, error) {
 	// Get absolute path of this static.go file
 	_, filename, _, _ := runtime.Caller(0)
 	// fmt.Println("Script file:", filename)          // No need to expose directory structure
 
 	// Get absolute path of the sample.json file in the same directory
 	basePath := filepath.Dir(filename)
-	sampleFilePath := filepath.Join(basePath, "sample.json")
+	JSONFilePath := filepath.Join(basePath, JSONFileName)
 	// fmt.Println("Sample file:", sampleFilePath)    // No need to expose directory structure
 
 	// Open sample.json file
-	sampleFile, err := os.Open(sampleFilePath)
+	JSONFile, err := os.Open(JSONFilePath)
 	if err != nil {
 		return nil, err // Return error instead of panicking
 	}
-	defer sampleFile.Close() // File will close once it is read below
+	defer JSONFile.Close() // File will close once it is read below
 
 	// Read and return sample.json as a slice of (pointers to) folders
-	jsonByte, err := io.ReadAll(sampleFile)
+	jsonByte, err := io.ReadAll(JSONFile)
 	if err != nil {
 		return nil, err
 	}

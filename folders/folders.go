@@ -49,7 +49,7 @@ func FetchAllFoldersByOrgID(orgID uuid.UUID, dataSet []*Folder) ([]*Folder, erro
 
 	if dataSet == nil {
 		// Fetch folders from sample file
-		folders, err = GetSampleData()
+		folders, err = GetJSONData("sample.json")
 		if err != nil {
 			return nil, err
 		}
