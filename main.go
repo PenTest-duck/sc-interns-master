@@ -8,15 +8,31 @@ import (
 )
 
 func main() {
-	req := &folders.FetchFolderRequest{
-		OrgID: uuid.FromStringOrNil(folders.DefaultOrgID),
+
+	// EDITED: allow for arbitrary OrgID input from command line
+	var orgID string
+	fmt.Print("OrgID to search for: ")
+	fmt.Scanf("%v", &orgID)
+
+	// Substitute default OrgID
+	if orgID == "default" {
+		orgID = folders.DefaultOrgID
 	}
 
+	// Prepares a request containing the UUID of organisation to get folders for
+	req := &folders.FetchFolderRequest{
+		OrgID: uuid.FromStringOrNil(orgID),
+	}
+
+	// Fetches slice of (pointers to) folders with the requested OrgID
 	res, err := folders.GetAllFolders(req)
+
+	// Display error (if any)
 	if err != nil {
-		fmt.Printf("%v", err)
+		fmt.Printf("%v\n", err)
 		return
 	}
 
-	folders.PrettyPrint(res)
+	// Prettify and print returned folders
+	fmt.Println(folders.Prettify(res))
 }
